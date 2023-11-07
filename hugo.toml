@@ -1,4 +1,4 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://tommylike.com/'
 theme = "LoveIt"
 
 # website title
@@ -103,7 +103,7 @@ dateFormat = "2006-01-02"
 title = "TommyLike"
 # website description for RSS, SEO, Open Graph and Twitter Cards
 # 网站描述, 用于 RSS, SEO, Open Graph 和 Twitter Cards
-description = "Open Source developer on OpenStack and Kubernetes"
+description = "It is not the mountain we conquer but ourselves"
 # website images for Open Graph and Twitter Cards
 # 网站图片, 用于 Open Graph 和 Twitter Cards
 images = ["/images/tommylike-cartoon.png"]
