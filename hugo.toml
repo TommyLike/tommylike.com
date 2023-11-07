@@ -23,7 +23,10 @@ hasCJKLanguage = false
 paginate = 12
 # google analytics code [UA-XXXXXXXX-X]
 # 谷歌分析代号 [UA-XXXXXXXX-X]
-googleAnalytics = "G-Q2S26C4BZ7"
+googleAnalytics = "UA-82048869-1"
+[services]
+    [services.googleAnalytics]
+    googleAnalytics = 'G-Q2S26C4BZ7'
 # copyright description used only for seo schema
 # 版权描述，仅仅用于 SEO
 copyright = ""
@@ -107,12 +110,6 @@ description = "It is not the mountain we conquer but ourselves"
 # website images for Open Graph and Twitter Cards
 # 网站图片, 用于 Open Graph 和 Twitter Cards
 images = ["/images/tommylike-cartoon.png"]
-
-[server]
-    [[server.headers]]
-        for = '/*'
-        [server.headers.values]
-        Content-Security-Policy = "default-src 'self' 'unsafe-eval' 'unsafe-inline' www.google-analytics.com www.googletagmanager.com fonts.googleapis.com maxcdn.bootstrapcdn.com fonts.gstatic.com vitals.vercel-insights.com;"
 
 # Header config
 # 页面头部导航栏配置
@@ -648,10 +645,10 @@ thumbnailUrl = ""
 # Analytics config
 # 网站分析配置
 [params.analytics]
-enable = false
+enable = true
 # Google Analytics
 [params.analytics.google]
-id = ""
+id = "UA-82048869-1"
 # whether to anonymize IP
 # 是否匿名化用户 IP
 anonymizeIP = true
