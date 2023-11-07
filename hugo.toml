@@ -108,6 +108,11 @@ description = "Open Source developer on OpenStack and Kubernetes"
 # 网站图片, 用于 Open Graph 和 Twitter Cards
 images = ["/images/tommylike-cartoon.png"]
 
+[[headers]]
+for = "/*"
+[headers.values]
+Content-Security-Policy = "default-src 'self' 'unsafe-eval' 'unsafe-inline' www.google-analytics.com www.googletagmanager.com fonts.googleapis.com maxcdn.bootstrapcdn.com fonts.gstatic.com vitals.vercel-insights.com;"
+
 # Header config
 # 页面头部导航栏配置
 [params.header]
