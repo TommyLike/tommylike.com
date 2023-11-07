@@ -1,0 +1,22 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>KVM/QEMU - Tag - TommyLike Blog</title>
+        <link>https://tommylike.com/tags/kvm/qemu/</link>
+        <description>KVM/QEMU - Tag - TommyLike Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>tommylikehu@gmail.com (TommyLike)</managingEditor>
+            <webMaster>tommylikehu@gmail.com (TommyLike)</webMaster><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><atom:link href="https://tommylike.com/tags/kvm/qemu/" rel="self" type="application/rss+xml" /><item>
+    <title>虚拟化简介</title>
+    <link>https://tommylike.com/kvm/</link>
+    <pubDate>Sat, 27 Aug 2016 18:59:44 &#43;0800</pubDate>
+    <author>TommyLike</author>
+    <guid>https://tommylike.com/kvm/</guid>
+    <description><![CDATA[虚拟化简介 什么是虚拟化? 虚拟化（Virtualization）技术最早出现在 20 世纪 60 年代的 IBM 大型机系统，在70年代的 System 370 系列中逐渐流行起来，这些机器通过一种叫虚拟机监控器（Virtual Machine Monitor，VMM）的程序在物理硬件之上生成许多可以运行独立操作系统软件的虚拟机（Virtual Machine）实例。随着近年多核系统、集群、网格甚至云计算的广泛部署，虚拟化技术在商业应用上的优势日益体现，不仅降低了 IT 成本，而且还增强了系统安全性和可靠性，虚拟化的概念也逐渐深入到人们日常的工作与生活中。
+计算机的系统结构如上图所示，在硬件层和操作系统层之间，我们有一个硬件抽象层，他是操作系统实际交互的系统层。利用这个交互层，我们就可以通过软件，模拟返回上层需要的数据，达到虚拟化的目的。
+虚拟化的实现方式 虚拟化有两种实现方式,一种是直接运行在硬件平台上，通知所有的硬件并管理客户系统，比如:Xen，一种是运行在传统的操作系统中，类似于在软件层面中提供虚拟环境，比如KVM和VirtualBox
+虚拟化的平台类型 全虚拟化 全虚拟化是指虚拟机模拟了完整的底层硬件，包括处理器、物理内存、时钟、外设等，使得为原始硬件设计的操作系统或其它系统软件完全不做任何修改就可以在虚拟机中运行。操作系统与真实硬件之间的交互可以看成是通过一个预先规定的硬件接口进行的。全虚拟化 VMM 以完整模拟硬件的方式提供全部接口（同时还必须模拟特权指令的执行过程）。这种模式下Guest OS 一般会降级运行(ring1)，当Guest OS需要执行特权指令时，会触发异常，被VMM捕获(ring0)并执行。使用全虚拟化的VMM有:Microsoft Virtual PC、VMware Workstation、Sun Virtual Box、Parallels Desktop for Mac
+超虚拟化 这是一种修改 Guest OS 部分访问特权状态的代码以便直接与 VMM 交互的技术。在超虚拟化虚拟机中，部分硬件接口以软件的形式提供给客户机操作系统，这可以通过 Hypercall（VMM 提供给 Guest OS 的直接调用，与系统调用类似）的方式来提供，比较著名的 VMM 有 Denali、Xen。
+硬件辅助虚拟化 硬件辅助虚拟化是指借助硬件（主要是主机处理器）的支持来实现高效的全虚拟化。例如有了 Intel-VT 技术的支持，Guest OS 和 VMM 的执行环境自动地完全隔离开来，Guest OS 有自己的“全套寄存器”，可以直接运行在最高级别。因此在上面的例子中，Guest OS 能够执行修改页表的汇编指令。Intel-VT 和 AMD-V 是目前 x86 体系结构上可用的两种硬件辅助虚拟化技术。
+部分虚拟化 VMM只模拟部分底层硬件，因此客户机操作系统不做修改是无法在虚拟机中运行的，其它程序可能也需要进行修改。在历史上，部分虚拟化是通往全虚拟化道路上的重要里程碑，最早出现在第一代的分时系统 CTSS 和 IBM M44/44X 实验性的分页系统中。]]></description>
+</item>
+</channel>
+</rss>

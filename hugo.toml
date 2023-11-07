@@ -267,7 +267,7 @@ avatarURL = "https://s.gravatar.com/avatar/b342014f4772fb9bc0f0577ef9c2f937?s=80
 title = "TommyLike"
 # subtitle shown in home page (HTML format is supported)
 # 主页显示的网站副标题 (允许 HTML 格式)
-subtitle = "Open Source developer on OpenStack and Kubernetes"
+subtitle = "It is not the mountain we conquer but ourselves"
 # whether to use typeit animation for subtitle
 # 是否为副标题显示打字机动画
 typeit = true
@@ -851,7 +851,7 @@ enable = true
 gravatarEmail = ""
 avatarURL = "/images/tommylike-cartoon.png"
 title = "TommyLike"
-subtitle = "Open Source developer on OpenStack and Kubernetes"
+subtitle = "It is not the mountain we conquer but ourselves"
 typeit = true
 social = true
 disclaimer = ""

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>reStructuredText入门 - TommyLike Blog</title><meta name="Description" content="It is not the mountain we conquer but ourselves"><meta property="og:title" content="reStructuredText入门" />
+<meta property="og:description" content="reStructuredText入门 什么是reStructuredText? reStructuredText通常简称为RST,ReST,reST,是Python里面最为常见的文档格式，他跟Markdown一样，语法在很多地方也很类似，如果有过Markdown的写作经验，入门reStructuredText是一件非常容易的事情。
+RST规范 如果你本地没有即时浏览的编辑器，强烈推荐通过Online Editor来快速上手，我们的介绍几乎都是从官方文档移植过来的。目的是便于个人整理和回顾，个人学习还是推荐去官方文档查看。
+文本 加粗和斜体 RST中的加粗和斜体跟Markdown中用法一致都是通过*和**来指定的:
+1 2 *this is italics* **this is bold** 替代文本(interpreted text) 一般配合rst中的描述标记使用，用来做链接，引用，解释等,例如站外链接:
+1 please contact email `&lt;http://username.organisze.org/&gt;`_ Embedded hyperlink 内嵌的外部链接，引用和定义放在一起
+1 2 3 4 5 `display_text link_address`_ :在引用符中间就是具体的显示字符和链接地址，后面紧跟_, #以下面实际的例子对比Markdown: External hyperlinks, like `Python &lt;http://www.python.org/&gt;`_. RST External hyperlinks, like [Python](http://www.python.org/). Markdown Hyperlink target 引用和定义分开，可以多次引用，使用_建立对应关系，可用于纸质输出文档，他的效果和我们上面最终的效果一致:
+1 2 3 External hyperlinks, like Python_. .. _Python: http://www.python.org/ Inline hyperlink 引用文章内部的区域,就类似于url里面的#,语法跟外部target引用一样，只是定义的时候需要使用如下的格式:
+1 2 3 4 5 6 7 8 9 10 11 12 13 # 其实就是在定义的时候生成一个带id的div，到时候再通过#指向该区域而已 External hyperlinks, like Python2_." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tommylike.com/rst/" /><meta property="og:image" content="https://tommylike.com/rst/featured-image.jpg"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2016-08-22T18:59:44+08:00" />
+<meta property="article:modified_time" content="2023-11-07T14:15:49+08:00" /><meta property="og:site_name" content="TommyLike" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://tommylike.com/rst/featured-image.jpg"/>
+<meta name="twitter:title" content="reStructuredText入门"/>
+<meta name="twitter:description" content="reStructuredText入门 什么是reStructuredText? reStructuredText通常简称为RST,ReST,reST,是Python里面最为常见的文档格式，他跟Markdown一样，语法在很多地方也很类似，如果有过Markdown的写作经验，入门reStructuredText是一件非常容易的事情。
+RST规范 如果你本地没有即时浏览的编辑器，强烈推荐通过Online Editor来快速上手，我们的介绍几乎都是从官方文档移植过来的。目的是便于个人整理和回顾，个人学习还是推荐去官方文档查看。
+文本 加粗和斜体 RST中的加粗和斜体跟Markdown中用法一致都是通过*和**来指定的:
+1 2 *this is italics* **this is bold** 替代文本(interpreted text) 一般配合rst中的描述标记使用，用来做链接，引用，解释等,例如站外链接:
+1 please contact email `&lt;http://username.organisze.org/&gt;`_ Embedded hyperlink 内嵌的外部链接，引用和定义放在一起
+1 2 3 4 5 `display_text link_address`_ :在引用符中间就是具体的显示字符和链接地址，后面紧跟_, #以下面实际的例子对比Markdown: External hyperlinks, like `Python &lt;http://www.python.org/&gt;`_. RST External hyperlinks, like [Python](http://www.python.org/). Markdown Hyperlink target 引用和定义分开，可以多次引用，使用_建立对应关系，可用于纸质输出文档，他的效果和我们上面最终的效果一致:
+1 2 3 External hyperlinks, like Python_. .. _Python: http://www.python.org/ Inline hyperlink 引用文章内部的区域,就类似于url里面的#,语法跟外部target引用一样，只是定义的时候需要使用如下的格式:
+1 2 3 4 5 6 7 8 9 10 11 12 13 # 其实就是在定义的时候生成一个带id的div，到时候再通过#指向该区域而已 External hyperlinks, like Python2_."/>
+<meta name="application-name" content="TommyLike">
+<meta name="apple-mobile-web-app-title" content="TommyLike"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://tommylike.com/rst/" /><link rel="prev" href="https://tommylike.com/python-advance/" /><link rel="next" href="https://tommylike.com/kvm/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "reStructuredText入门",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/tommylike.com\/rst\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/tommylike.com\/rst\/featured-image.jpg",
+                            "width":  1280 ,
+                            "height":  853 
+                        }],"genre": "posts","keywords": "OpenStack, Python","wordcount":  632 ,
+        "url": "https:\/\/tommylike.com\/rst\/","datePublished": "2016-08-22T18:59:44+08:00","dateModified": "2023-11-07T14:15:49+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "TommyLike","logo": "https:\/\/s.gravatar.com\/avatar\/b342014f4772fb9bc0f0577ef9c2f937?s=80"},"author": {
+                "@type": "Person",
+                "name": "TommyLike"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="TommyLike Blog"><span class="header-title-pre"><i class='far fa-kiss-wink-heart fa-fw' aria-hidden='true'></i></span>Lifelong Learning</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="https://github.com/TommyLike/tommylike.cn" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw' aria-hidden='true'></i>  </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="TommyLike Blog"><span class="header-title-pre"><i class='far fa-kiss-wink-heart fa-fw' aria-hidden='true'></i></span>Lifelong Learning</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="https://github.com/TommyLike/tommylike.cn" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw' aria-hidden='true'></i></a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">reStructuredText入门</h1><h2 class="single-subtitle">python文档规范学习</h2><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://github.com/TommyLike" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>TommyLike</a></span>&nbsp;<span class="post-category">included in <a href="/categories/openstack/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>OpenStack</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2016-08-22">2016-08-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;632 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;<span id="/rst/" class="leancloud_visitors" data-flag-title="reStructuredText入门">
+                        <i class="far fa-eye fa-fw" aria-hidden="true"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;views
+                    </span>&nbsp;</div>
+        </div><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/rst/featured-image.jpg"
+        data-srcset="/rst/featured-image.jpg, /rst/featured-image.jpg 1.5x, /rst/featured-image.jpg 2x"
+        data-sizes="auto"
+        alt="/rst/featured-image.jpg"
+        title="/rst/featured-image.jpg" /></div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#什么是restructuredtext">什么是reStructuredText?</a></li>
+    <li><a href="#rst规范">RST规范</a>
+      <ul>
+        <li><a href="#文本">文本</a>
+          <ul>
+            <li><a href="#加粗和斜体">加粗和斜体</a></li>
+            <li><a href="#替代文本interpreted-text">替代文本(interpreted text)</a></li>
+            <li><a href="#embedded-hyperlink">Embedded hyperlink</a></li>
+            <li><a href="#hyperlink-target">Hyperlink target</a></li>
+            <li><a href="#inline-hyperlink">Inline hyperlink</a></li>
+            <li><a href="#图片引用">图片引用</a></li>
+            <li><a href="#页脚注释引用">页脚注释引用</a></li>
+            <li><a href="#引证">引证</a></li>
+          </ul>
+        </li>
+        <li><a href="#段落和其他">段落和其他</a>
+          <ul>
+            <li><a href="#标题">标题</a></li>
+            <li><a href="#段落">段落</a></li>
+            <li><a href="#无序列表">无序列表</a></li>
+          </ul>
+        </li>
+        <li><a href="#有序列表">有序列表</a>
+          <ul>
+            <li><a href="#定义列表">定义列表</a></li>
+            <li><a href="#字段列表">字段列表</a></li>
+            <li><a href="#命令选项列表">命令选项列表</a></li>
+          </ul>
+        </li>
+        <li><a href="#literal-blocksquota-blocks">Literal Blocks(Quota Blocks)</a>
+          <ul>
+            <li><a href="#表格">表格</a></li>
+            <li><a href="#过渡">过渡</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#rst文件预览windows环境">RST文件预览(windows环境)</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="restructuredtext入门">reStructuredText入门</h1>
+<h2 id="什么是restructuredtext">什么是reStructuredText?</h2>
+<p>reStructuredText通常简称为RST,ReST,reST,是Python里面最为常见的文档格式，他跟Markdown一样，语法在很多地方也很类似，如果有过Markdown的写作经验，入门reStructuredText是一件非常容易的事情。</p>
+<h2 id="rst规范">RST规范</h2>
+<p>如果你本地没有即时浏览的编辑器，强烈推荐通过<a href="http://rst.ninjs.org/" target="_blank" rel="noopener noreffer ">Online Editor</a>来快速上手，我们的介绍几乎都是从<a href="http://docutils.sourceforge.net/docs/user/rst/quickref.html" target="_blank" rel="noopener noreffer ">官方文档</a>移植过来的。目的是便于个人整理和回顾，个人学习还是推荐去官方文档查看。</p>
+<h3 id="文本">文本</h3>
+<h4 id="加粗和斜体">加粗和斜体</h4>
+<p>RST中的加粗和斜体跟Markdown中用法一致都是通过*和**来指定的:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl"><span class="ge">*this is italics*</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="gs">**this is bold**</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="替代文本interpreted-text">替代文本(interpreted text)</h4>
+<p>一般配合rst中的描述标记使用，用来做链接，引用，解释等,例如站外链接:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">please contact email <span class="s">`&lt;http://username.organisze.org/&gt;`_</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="embedded-hyperlink">Embedded hyperlink</h4>
+<p>内嵌的外部链接，引用和定义放在一起</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl"><span class="s">`display_text link_address`_</span> :在引用符中间就是具体的显示字符和链接地址，后面紧跟_,  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>#以下面实际的例子对比Markdown:  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>External hyperlinks, like <span class="s">`Python </span><span class="si">&lt;http://www.python.org/&gt;</span><span class="s">`_</span>.  RST  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>External hyperlinks, like [Python](http://www.python.org/).  Markdown  <span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="hyperlink-target">Hyperlink target</h4>
+<p>引用和定义分开，可以多次引用，使用_建立对应关系，可用于纸质输出文档，他的效果和我们上面最终的效果一致:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">External hyperlinks, like Python_.  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">..</span> <span class="nt">_Python:</span> http://www.python.org/  <span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="inline-hyperlink">Inline hyperlink</h4>
+<p>引用文章内部的区域,就类似于url里面的#,语法跟外部target引用一样，只是定义的时候需要使用如下的格式:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl"># 其实就是在定义的时候生成一个带id的div，到时候再通过#指向该区域而已<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>External hyperlinks, like Python2_.  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">..</span> <span class="nt">_Python2:</span>  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>this is python2 content  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>#RST生成的title默认就带有id，所以可以直接引用title  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>Title link :<span class="s">`This is title`_</span>.  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>This is title  <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>=============    <span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="图片引用">图片引用</h4>
+<p>简单的图片插入可以使用**::image**,具体参照如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">     For instance:<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">     ..</span> <span class="ow">image</span><span class="p">::</span> images/ball1.gif (这里支持相对和绝对路径)  <span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果需要在inline中使用png图标，可以配合使用||:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">     The |biohazard| symbol must be used on containers used to dispose of medical waste.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">     ..</span> <span class="nt">|biohazard|</span> <span class="ow">image</span><span class="p">::</span> biohazard.png<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="页脚注释引用">页脚注释引用</h4>
+<p>可以使用[index]_:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">    Footnote references, like <span class="s">[5]_</span>.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">    ..</span> <span class="nt">[5]</span> A numerical footnote. Note<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>多个引用支持配置自增长,#是基于已有的footage列表做累加，遇到已有的定义会自动跳过</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">    Footnote references, like footage_1 <span class="s">[#]_</span>.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    Footnote references, like footage_2 <span class="s">[#]_</span>.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">    ..</span> <span class="nt">[1]</span> this is footage 1<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">    ..</span> <span class="nt">[#]</span> This is the first one.    actual 2<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">    ..</span> <span class="nt">[#]</span> This is the second one.   actual 3<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="引证">引证</h4>
+<p>引证的用法跟页脚注释引用一致:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  Citation references, like <span class="s">[CIT2002]_</span>.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  Note that citations may get<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  rearranged, e.g., to the bottom of<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  the &#34;page&#34;.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">  ..</span> <span class="nt">[CIT2002]</span> A citation<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>     (as often used in journals).<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="段落和其他">段落和其他</h3>
+<h4 id="标题">标题</h4>
+<p>标题是通过在文字的下面或者上下面增加一行特殊字符表示，字符的长度不能短于文字的长度，可供选择的字符有:<code>= -  : ' &quot; ~ ^ _ * + # &lt; &gt;</code>, 比如:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  =====<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  Title<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  =====<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  Subtitle<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  --------<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>虽然RST本身没有规定层级标题的用法，但是python对不同级别的标题还是有建议规范:</p>
+<pre><code>1. \# with overline, for parts
+2. \* with overline, for chapters
+3. =, for sections
+4. -, for subsections
+5. ^, for subsubsections
+6. &quot;, for paragraphs
+</code></pre>
+<h4 id="段落">段落</h4>
+<p>段落不需要缩进，但是新的段落需要空行，如一下面所示:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  This is a paragraph.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  This is another paragraph<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="无序列表">无序列表</h4>
+<p>RST中的无序列表跟markdown很像，支持多个不同的符号<code>- * +</code>,符号和内容之前需要有空格:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  This is a list<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>
+</span></span><span class="line"><span class="cl">  <span class="m">-</span> item1<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="m">-</span> item2<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="m">-</span> item3<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="有序列表">有序列表</h3>
+<p>RST中的有序列表支持使用**#**作为自增长符号:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  This is sequenced list:<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>
+</span></span><span class="line"><span class="cl">  <span class="m">1.</span> item1<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="m">2.</span> item2<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="m">3.</span> item3<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="m">#.</span> item4<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="定义列表">定义列表</h4>
+<p>定义列表在python的documentation中很常见，需要注意的是在定义的内容中需要缩进，不同的内容之间需要有空行:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  Definition lists:<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  what<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    Definition lists associate a term with<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    a definition.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  how<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    The term is a one-line phrase, and the<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    definition is one or more paragraphs or<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    body elements, indented relative to the<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    term. Blank lines are not allowed<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    between term and definition.<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="字段列表">字段列表</h4>
+<p>字段列表在form和brief中比较常见，格式跟定义列表很像，区别在于需要以**:**开头:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  <span class="nc">:Authors:</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>      Tony J. (Tibs) Ibbs,<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>      David Goodger<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>      (and sundry other good-natured folks)<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="nc">:Version:</span> <span class="nf">1.0 of 2001/08/08</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="nc">:Dedication:</span> <span class="nf">To my father.</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="命令选项列表">命令选项列表</h4>
+<p>这个能帮我们快速构建命令行参数文档，需要注意的是在描述和参数中间至少需要两个空格:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  -a            command-line option &#34;a&#34;<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  -b file       options can have arguments<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>                and long descriptions<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  --long        options can be long also<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  --input=file  long options can also have<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>                arguments<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  /V            DOS/VMS-style options too<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="literal-blocksquota-blocks">Literal Blocks(Quota Blocks)</h3>
+<p>这个跟我们的引用区域很像，通过查看生成的html源代码可以看到literal blocks会生成**&lt;pre&gt;<strong>标记，
+而我们的引用区域是直接生成</strong>&lt;blockquota&gt;<strong>标签
+这个也能方便我们理解他的作用,一般通过</strong>::**来标记开始，内容区域需要使用缩进:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  content below is literal Blocks<span class="se">::</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="s">    this is content</span>
+</span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">    this is also content
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s"></span>  this is another paragraph<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者通过**&gt;**来表示:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  content below is literal Blocks::<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  &gt; this is content<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="表格">表格</h4>
+<p>表格的格式如下,跟markdown一样都比较清晰，自己写文档的时候可以直接借助工具生成，不需要手动编辑,在这里推荐<a href="http://www.tablesgenerator.com/text_tables" target="_blank" rel="noopener noreffer ">Table Generator</a>,不过他目前只是简单支持:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  +------------+------------+-----------+<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="o">|</span> Header 1   | Header 2   | Header 3  |<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  +============+============+===========+ <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="o">|</span> body row 1 | column 2   | column 3  |<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  +------------+------------+-----------+<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="o">|</span> body row 2 | Cells may span columns.|<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  +------------+------------+-----------+<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="o">|</span> body row 3 | Cells may  | - Cells   |<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  +------------+ span rows. | - contain |<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="o">|</span> body row 4 |            | - blocks. |<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  +------------+------------+-----------+<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="过渡">过渡</h4>
+<p>即我们html常见的&lt;hr&gt;,一般用的很少，在视觉上隔开段落:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rst" data-lang="rst"><span class="line"><span class="cl">  A transition marker is a horizontal line<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  of 4 or more repeated punctuation<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  characters.<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  ------------<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  A transition should not begin or end a<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  section or document, nor should two<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  transitions be immediately adjacent.<span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="rst文件预览windows环境">RST文件预览(windows环境)</h2>
+<p>跟markdown一样，在编写文档的时候，我们也需要能够本地即时预览，在这一点上Sublimetext和他强大的plugin再合适不过了，这里推荐<a href="https://github.com/timonwong/OmniMarkupPreviewer" target="_blank" rel="noopener noreffer "><strong>OmniMarkupPreviewer</strong></a>，大部分的markup语言都支持:</p>
+<ol>
+<li>Markdown</li>
+<li>reStruecturedText</li>
+<li>Textile</li>
+<li>Pod</li>
+<li>RDoc</li>
+<li>Org Mode</li>
+<li>MediaWiki</li>
+<li>AsciiDoc</li>
+<li>Literate Haskell</li>
+<li>WikiCreole</li>
+</ol>
+<p>插件支持实时预览,浏览器预览快捷键(<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd>)</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-11-07&nbsp;<a class="git-hash" href="https://github.com/TommyLike/tommylike.cn/commit/7ab7ea9d06de09a9195066e93cc9c9d9e4cfae7b" target="_blank" title="commit by TommyLike(tommylikehu@gmail.com) 7ab7ea9d06de09a9195066e93cc9c9d9e4cfae7b: Add missing posts from tommylike github">
+                                    <i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>7ab7ea9</a></span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/rst/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://tommylike.com/rst/" data-title="reStructuredText入门" data-hashtags="OpenStack,Python"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://tommylike.com/rst/" data-hashtag="OpenStack"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://tommylike.com/rst/" data-title="reStructuredText入门"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://tommylike.com/rst/" data-title="reStructuredText入门"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://tommylike.com/rst/" data-title="reStructuredText入门"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/openstack/">OpenStack</a>,&nbsp;<a href="/tags/python/">Python</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/python-advance/" class="prev" rel="prev" title="Python常见特性入门(一)"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Python常见特性入门(一)</a>
+            <a href="/kvm/" class="next" rel="next" title="虚拟化简介">虚拟化简介<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"><div id="valine" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://github.com/TommyLike" target="_blank">TommyLike</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/valine/valine.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/valine@1.5.0/dist/Valine.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.13.1/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{"valine":{"appId":"QGzwQXOqs5JOhN4RGPOkR2mR-MdYXbMMI","appKey":"WBmoGyJtbqUswvfLh6L8iEBr","avatar":"mp","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@14.0.0/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":false,"highlight":true,"lang":"en","pageSize":10,"placeholder":"Your comment ...","recordIP":true,"serverURLs":"https://leancloud.hugoloveit.com","visitor":true}},"search":{"algoliaAppID":"","algoliaIndex":"","algoliaSearchKey":"","highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

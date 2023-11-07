@@ -1,0 +1,61 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>OpenStack - Category - TommyLike Blog</title>
+        <link>https://tommylike.com/categories/openstack/</link>
+        <description>OpenStack - Category - TommyLike Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>tommylikehu@gmail.com (TommyLike)</managingEditor>
+            <webMaster>tommylikehu@gmail.com (TommyLike)</webMaster><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sat, 27 Aug 2016 18:59:44 &#43;0800</lastBuildDate><atom:link href="https://tommylike.com/categories/openstack/" rel="self" type="application/rss+xml" /><item>
+    <title>虚拟化简介</title>
+    <link>https://tommylike.com/kvm/</link>
+    <pubDate>Sat, 27 Aug 2016 18:59:44 &#43;0800</pubDate>
+    <author>TommyLike</author>
+    <guid>https://tommylike.com/kvm/</guid>
+    <description><![CDATA[虚拟化简介 什么是虚拟化? 虚拟化（Virtualization）技术最早出现在 20 世纪 60 年代的 IBM 大型机系统，在70年代的 System 370 系列中逐渐流行起来，这些机器通过一种叫虚拟机监控器（Virtual Machine Monitor，VMM）的程序在物理硬件之上生成许多可以运行独立操作系统软件的虚拟机（Virtual Machine）实例。随着近年多核系统、集群、网格甚至云计算的广泛部署，虚拟化技术在商业应用上的优势日益体现，不仅降低了 IT 成本，而且还增强了系统安全性和可靠性，虚拟化的概念也逐渐深入到人们日常的工作与生活中。
+计算机的系统结构如上图所示，在硬件层和操作系统层之间，我们有一个硬件抽象层，他是操作系统实际交互的系统层。利用这个交互层，我们就可以通过软件，模拟返回上层需要的数据，达到虚拟化的目的。
+虚拟化的实现方式 虚拟化有两种实现方式,一种是直接运行在硬件平台上，通知所有的硬件并管理客户系统，比如:Xen，一种是运行在传统的操作系统中，类似于在软件层面中提供虚拟环境，比如KVM和VirtualBox
+虚拟化的平台类型 全虚拟化 全虚拟化是指虚拟机模拟了完整的底层硬件，包括处理器、物理内存、时钟、外设等，使得为原始硬件设计的操作系统或其它系统软件完全不做任何修改就可以在虚拟机中运行。操作系统与真实硬件之间的交互可以看成是通过一个预先规定的硬件接口进行的。全虚拟化 VMM 以完整模拟硬件的方式提供全部接口（同时还必须模拟特权指令的执行过程）。这种模式下Guest OS 一般会降级运行(ring1)，当Guest OS需要执行特权指令时，会触发异常，被VMM捕获(ring0)并执行。使用全虚拟化的VMM有:Microsoft Virtual PC、VMware Workstation、Sun Virtual Box、Parallels Desktop for Mac
+超虚拟化 这是一种修改 Guest OS 部分访问特权状态的代码以便直接与 VMM 交互的技术。在超虚拟化虚拟机中，部分硬件接口以软件的形式提供给客户机操作系统，这可以通过 Hypercall（VMM 提供给 Guest OS 的直接调用，与系统调用类似）的方式来提供，比较著名的 VMM 有 Denali、Xen。
+硬件辅助虚拟化 硬件辅助虚拟化是指借助硬件（主要是主机处理器）的支持来实现高效的全虚拟化。例如有了 Intel-VT 技术的支持，Guest OS 和 VMM 的执行环境自动地完全隔离开来，Guest OS 有自己的“全套寄存器”，可以直接运行在最高级别。因此在上面的例子中，Guest OS 能够执行修改页表的汇编指令。Intel-VT 和 AMD-V 是目前 x86 体系结构上可用的两种硬件辅助虚拟化技术。
+部分虚拟化 VMM只模拟部分底层硬件，因此客户机操作系统不做修改是无法在虚拟机中运行的，其它程序可能也需要进行修改。在历史上，部分虚拟化是通往全虚拟化道路上的重要里程碑，最早出现在第一代的分时系统 CTSS 和 IBM M44/44X 实验性的分页系统中。]]></description>
+</item>
+<item>
+    <title>reStructuredText入门</title>
+    <link>https://tommylike.com/rst/</link>
+    <pubDate>Mon, 22 Aug 2016 18:59:44 &#43;0800</pubDate>
+    <author>TommyLike</author>
+    <guid>https://tommylike.com/rst/</guid>
+    <description><![CDATA[reStructuredText入门 什么是reStructuredText? reStructuredText通常简称为RST,ReST,reST,是Python里面最为常见的文档格式，他跟Markdown一样，语法在很多地方也很类似，如果有过Markdown的写作经验，入门reStructuredText是一件非常容易的事情。
+RST规范 如果你本地没有即时浏览的编辑器，强烈推荐通过Online Editor来快速上手，我们的介绍几乎都是从官方文档移植过来的。目的是便于个人整理和回顾，个人学习还是推荐去官方文档查看。
+文本 加粗和斜体 RST中的加粗和斜体跟Markdown中用法一致都是通过*和**来指定的:
+1 2 *this is italics* **this is bold** 替代文本(interpreted text) 一般配合rst中的描述标记使用，用来做链接，引用，解释等,例如站外链接:
+1 please contact email `&lt;http://username.organisze.org/&gt;`_ Embedded hyperlink 内嵌的外部链接，引用和定义放在一起
+1 2 3 4 5 `display_text link_address`_ :在引用符中间就是具体的显示字符和链接地址，后面紧跟_, #以下面实际的例子对比Markdown: External hyperlinks, like `Python &lt;http://www.python.org/&gt;`_. RST External hyperlinks, like [Python](http://www.python.org/). Markdown Hyperlink target 引用和定义分开，可以多次引用，使用_建立对应关系，可用于纸质输出文档，他的效果和我们上面最终的效果一致:
+1 2 3 External hyperlinks, like Python_. .. _Python: http://www.python.org/ Inline hyperlink 引用文章内部的区域,就类似于url里面的#,语法跟外部target引用一样，只是定义的时候需要使用如下的格式:
+1 2 3 4 5 6 7 8 9 10 11 12 13 # 其实就是在定义的时候生成一个带id的div，到时候再通过#指向该区域而已 External hyperlinks, like Python2_.]]></description>
+</item>
+<item>
+    <title>Oslo Message 入门</title>
+    <link>https://tommylike.com/amqp/</link>
+    <pubDate>Wed, 03 Aug 2016 21:59:44 &#43;0800</pubDate>
+    <author>tommylike</author>
+    <guid>https://tommylike.com/amqp/</guid>
+    <description><![CDATA[Oslo Message 入门 什么是AMQP? AMQP(Advanced Message Queuing Protocol)是一个异步消息传递所使用的开方的应用层协议规范，主要包括了消息的导向，队列，路由，可靠性和安全性。通过定义消息在网络上传输的字节流格式，不同的具体AMQP实现之间可以进行互操作。
+The Advanced Message Queuing Protocol (AMQP) is an open standard application layer protocol for message-oriented middleware. The defining features of AMQP are message orientation, queuing, routing (including point-to-point and publish-and-subscribe), reliability and security
+他大体的结构如上所示,包括几个重要的元素:
+Publisher，即我们的消息发送方。 Broker/Server，服务中间件(转发消息，确定映射规则，存储消息等)。 Subscriber，消息的接收和订阅方。 Exchange，负责将不同的消息送达到不同Subscriber的Queue上，同一个Exchange可以有多个Queue。 Queue，接收方的消息队列，用来保存来不及处理的信息。 Routing Key，消息携带的路由信息，决定了消息可以送到哪些接收方。 Binding Key，Queue的路由信息，决定了Queue可以接收哪些信息。 Exchange Type,交换类型，决定了消息转发的具体匹配模式，有三种模式: Direct:单一的匹配模式，类似于通过id直接指定接收方。 Topic:正则的匹配模式，符合正则匹配的Queue都能收到该消息。 Fanout:广播模式，所有的都能收到。 AMQP只是一个通用的协议，在此协议上有不同实现的服务中间件，比较常见的有以下几种:
+RabbitMQ(主页) Qpid(主页) ZeroMQ(主页) Kombu(主页) 我们这里使用RabbitMQ作为我们的中间件实现。
+RabbitMQ 环境准备 官网上面可以很方面找到下载的操作指导，这里以我们的环境为例，下载完成后，需要把压缩包解压到我们的安装目录,运行前可以在配置文件中进行简单的配置调整:
+1 $RABBITMQ_HOME/etc/rabbitmq/rabbitmq-env.conf 执行脚本sbin/rabbitmq-server，服务即可拉起:
+1 2 3 4 5 6 #以后台进程的方式拉起 rabbitmq-server -detached #暂停服务 rabbitmqctl stop #查看服务状态 rabbitmqctl status 服务拉起后，就可以配置和使用message了。]]></description>
+</item>
+<item>
+    <title>Paste Deploy 入门</title>
+    <link>https://tommylike.com/paste-deploy/</link>
+    <pubDate>Wed, 03 Aug 2016 21:59:44 &#43;0800</pubDate>
+    <author>tommylike</author>
+    <guid>https://tommylike.com/paste-deploy/</guid>
+    <description><![CDATA[Paste Deploy 入门 什么是Paste Deploy Paste Depoly是一个用于发现和配置WSGI application和server的系统,以下是官方对PasteDeploy的定义:
+Paste Deployment is a system for finding and configuring WSGI applications and servers. For WSGI application consumers it provides a single, simple function (loadapp) for loading a WSGI application from a configuration file or a Python Egg. For WSGI application providers it only asks for a single, simple entry point to your application, so that application users don’t need to be exposed to the implementation details of your application.]]></description>
+</item>
+</channel>
+</rss>

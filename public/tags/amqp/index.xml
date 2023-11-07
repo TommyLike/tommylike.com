@@ -1,0 +1,23 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>AMQP - Tag - TommyLike Blog</title>
+        <link>https://tommylike.com/tags/amqp/</link>
+        <description>AMQP - Tag - TommyLike Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>tommylikehu@gmail.com (TommyLike)</managingEditor>
+            <webMaster>tommylikehu@gmail.com (TommyLike)</webMaster><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Wed, 03 Aug 2016 21:59:44 &#43;0800</lastBuildDate><atom:link href="https://tommylike.com/tags/amqp/" rel="self" type="application/rss+xml" /><item>
+    <title>Oslo Message 入门</title>
+    <link>https://tommylike.com/amqp/</link>
+    <pubDate>Wed, 03 Aug 2016 21:59:44 &#43;0800</pubDate>
+    <author>tommylike</author>
+    <guid>https://tommylike.com/amqp/</guid>
+    <description><![CDATA[Oslo Message 入门 什么是AMQP? AMQP(Advanced Message Queuing Protocol)是一个异步消息传递所使用的开方的应用层协议规范，主要包括了消息的导向，队列，路由，可靠性和安全性。通过定义消息在网络上传输的字节流格式，不同的具体AMQP实现之间可以进行互操作。
+The Advanced Message Queuing Protocol (AMQP) is an open standard application layer protocol for message-oriented middleware. The defining features of AMQP are message orientation, queuing, routing (including point-to-point and publish-and-subscribe), reliability and security
+他大体的结构如上所示,包括几个重要的元素:
+Publisher，即我们的消息发送方。 Broker/Server，服务中间件(转发消息，确定映射规则，存储消息等)。 Subscriber，消息的接收和订阅方。 Exchange，负责将不同的消息送达到不同Subscriber的Queue上，同一个Exchange可以有多个Queue。 Queue，接收方的消息队列，用来保存来不及处理的信息。 Routing Key，消息携带的路由信息，决定了消息可以送到哪些接收方。 Binding Key，Queue的路由信息，决定了Queue可以接收哪些信息。 Exchange Type,交换类型，决定了消息转发的具体匹配模式，有三种模式: Direct:单一的匹配模式，类似于通过id直接指定接收方。 Topic:正则的匹配模式，符合正则匹配的Queue都能收到该消息。 Fanout:广播模式，所有的都能收到。 AMQP只是一个通用的协议，在此协议上有不同实现的服务中间件，比较常见的有以下几种:
+RabbitMQ(主页) Qpid(主页) ZeroMQ(主页) Kombu(主页) 我们这里使用RabbitMQ作为我们的中间件实现。
+RabbitMQ 环境准备 官网上面可以很方面找到下载的操作指导，这里以我们的环境为例，下载完成后，需要把压缩包解压到我们的安装目录,运行前可以在配置文件中进行简单的配置调整:
+1 $RABBITMQ_HOME/etc/rabbitmq/rabbitmq-env.conf 执行脚本sbin/rabbitmq-server，服务即可拉起:
+1 2 3 4 5 6 #以后台进程的方式拉起 rabbitmq-server -detached #暂停服务 rabbitmqctl stop #查看服务状态 rabbitmqctl status 服务拉起后，就可以配置和使用message了。]]></description>
+</item>
+</channel>
+</rss>

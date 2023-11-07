@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Paste Deploy 入门 - TommyLike Blog</title><meta name="Description" content="It is not the mountain we conquer but ourselves"><meta property="og:title" content="Paste Deploy 入门" />
+<meta property="og:description" content="Paste Deploy 入门 什么是Paste Deploy Paste Depoly是一个用于发现和配置WSGI application和server的系统,以下是官方对PasteDeploy的定义:
+Paste Deployment is a system for finding and configuring WSGI applications and servers. For WSGI application consumers it provides a single, simple function (loadapp) for loading a WSGI application from a configuration file or a Python Egg. For WSGI application providers it only asks for a single, simple entry point to your application, so that application users don’t need to be exposed to the implementation details of your application." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tommylike.com/paste-deploy/" /><meta property="og:image" content="https://tommylike.com/paste-deploy/featured-image.jpg"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2016-08-03T21:59:44+08:00" />
+<meta property="article:modified_time" content="2023-11-07T14:15:49+08:00" /><meta property="og:site_name" content="TommyLike" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://tommylike.com/paste-deploy/featured-image.jpg"/>
+<meta name="twitter:title" content="Paste Deploy 入门"/>
+<meta name="twitter:description" content="Paste Deploy 入门 什么是Paste Deploy Paste Depoly是一个用于发现和配置WSGI application和server的系统,以下是官方对PasteDeploy的定义:
+Paste Deployment is a system for finding and configuring WSGI applications and servers. For WSGI application consumers it provides a single, simple function (loadapp) for loading a WSGI application from a configuration file or a Python Egg. For WSGI application providers it only asks for a single, simple entry point to your application, so that application users don’t need to be exposed to the implementation details of your application."/>
+<meta name="application-name" content="TommyLike">
+<meta name="apple-mobile-web-app-title" content="TommyLike"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://tommylike.com/paste-deploy/" /><link rel="next" href="https://tommylike.com/amqp/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Paste Deploy 入门",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/tommylike.com\/paste-deploy\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/tommylike.com\/paste-deploy\/featured-image.jpg",
+                            "width":  890 ,
+                            "height":  593 
+                        }],"genre": "posts","keywords": "PasteDeploy, Python, OpenStack","wordcount":  688 ,
+        "url": "https:\/\/tommylike.com\/paste-deploy\/","datePublished": "2016-08-03T21:59:44+08:00","dateModified": "2023-11-07T14:15:49+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "TommyLike","logo": "https:\/\/s.gravatar.com\/avatar\/b342014f4772fb9bc0f0577ef9c2f937?s=80"},"author": {
+                "@type": "Person",
+                "name": "tommylike"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="TommyLike Blog"><span class="header-title-pre"><i class='far fa-kiss-wink-heart fa-fw' aria-hidden='true'></i></span>Lifelong Learning</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="https://github.com/TommyLike/tommylike.cn" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw' aria-hidden='true'></i>  </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="TommyLike Blog"><span class="header-title-pre"><i class='far fa-kiss-wink-heart fa-fw' aria-hidden='true'></i></span>Lifelong Learning</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="https://github.com/TommyLike/tommylike.cn" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw' aria-hidden='true'></i></a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Paste Deploy 入门</h1><h2 class="single-subtitle">Paste Deployment的个人学习笔记</h2><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://github.com/TommyLike" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>tommylike</a></span>&nbsp;<span class="post-category">included in <a href="/categories/openstack/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>OpenStack</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2016-08-03">2016-08-03</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;688 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;<span id="/paste-deploy/" class="leancloud_visitors" data-flag-title="Paste Deploy 入门">
+                        <i class="far fa-eye fa-fw" aria-hidden="true"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;views
+                    </span>&nbsp;</div>
+        </div><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/paste-deploy/featured-image.jpg"
+        data-srcset="/paste-deploy/featured-image.jpg, /paste-deploy/featured-image.jpg 1.5x, /paste-deploy/featured-image.jpg 2x"
+        data-sizes="auto"
+        alt="/paste-deploy/featured-image.jpg"
+        title="/paste-deploy/featured-image.jpg" /></div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#什么是paste-deploy">什么是Paste Deploy</a></li>
+    <li><a href="#安装paste-deploy">安装Paste Deploy</a></li>
+    <li><a href="#paste-deploy-服务加载">Paste Deploy 服务加载</a></li>
+    <li><a href="#config-配置解析">Config 配置解析</a>
+      <ul>
+        <li><a href="#composite">composite</a></li>
+        <li><a href="#app">app</a></li>
+        <li><a href="#filter">filter</a></li>
+        <li><a href="#config-variables">Config Variables</a></li>
+        <li><a href="#factories">Factories</a>
+          <ul>
+            <li><a href="#1app_factory">1.app_factory</a></li>
+            <li><a href="#2filter_factory">2.filter_factory</a></li>
+            <li><a href="#3filter_app_factory">3.filter_app_factory</a></li>
+            <li><a href="#4-filter_server">4. filter_server</a></li>
+            <li><a href="#5-server_factory">5. server_factory</a></li>
+          </ul>
+        </li>
+        <li><a href="#oslomiddleware">Oslo.middleware</a></li>
+        <li><a href="#安装">安装</a></li>
+        <li><a href="#healthcheck-middleware">healthcheck middleware</a></li>
+        <li><a href="#cors-middleware">cors middleware</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="paste-deploy-入门">Paste Deploy 入门</h1>
+<h2 id="什么是paste-deploy">什么是Paste Deploy</h2>
+<p>Paste Depoly是一个用于发现和配置WSGI application和server的系统,以下是官方对PasteDeploy的定义:</p>
+<blockquote>
+<p>Paste Deployment is a system for finding and configuring WSGI applications and servers.
+For WSGI application consumers it provides a single, simple function (loadapp) for loading a
+WSGI application from a configuration file or a Python Egg. For WSGI application providers it
+only asks for a single, simple entry point to your application, so that application users don’t
+need to be exposed to the implementation details of your application.</p>
+</blockquote>
+<p>最主要的就是能快速构建复杂且独立的WSGI程序，还能屏蔽具体的实现。</p>
+<h2 id="安装paste-deploy">安装Paste Deploy</h2>
+<p>PasteDeploy已经从Paste库中剥离出来，可以单独安装:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo pip install PasteDeploy
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="paste-deploy-服务加载">Paste Deploy 服务加载</h2>
+<p>使用PasteDeploy加载服务非常简单，大致的代码如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">paste.deploy</span> <span class="kn">import</span> <span class="n">loadapp</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;config.ini&#39;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl"><span class="n">appname</span><span class="o">=</span><span class="s1">&#39;test_app&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">wsgi_app</span> <span class="o">=</span> <span class="n">loadapp</span><span class="p">(</span><span class="s1">&#39;config:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;config.ini&#39;</span><span class="p">,</span> <span class="n">appname</span><span class="p">,</span><span class="n">relative_to</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="n">server</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">,</span> <span class="n">wsgi_app</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用loadapp指定配置文加载app最终放入server即可，需要注意的是:</p>
+<ol>
+<li>appname即你需要执行的application名，需要与配置文件中的名称保持一致( <em>[composite:xxxx]</em> )</li>
+<li>load_app需要指定配置文件的绝对路径，如果是相对路径，需要通过 <em>relative_to</em> 来指定相对的目录</li>
+<li>配置文件需要类似 <em>config:absolute_path</em> 格式</li>
+</ol>
+<h2 id="config-配置解析">Config 配置解析</h2>
+<p>配置文件使用**.INI(initialize)**的文件格式，在ini文件中一般使用键值对的方式进行配置:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="na">name</span><span class="o">=</span><span class="s">value</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>配置文件中可以使用**;<strong>或者</strong>#**作为注释符(必须在行首)，配置文件一般如下所示:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1">#this is a comment</span>
+</span></span><span class="line"><span class="cl"><span class="k">[composite:main]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#urlmap</span>
+</span></span><span class="line"><span class="cl"><span class="na">/</span> <span class="o">=</span> <span class="s">home</span>
+</span></span><span class="line"><span class="cl"><span class="na">/blog</span> <span class="o">=</span> <span class="s">blog</span>
+</span></span><span class="line"><span class="cl"><span class="na">/wiki</span> <span class="o">=</span> <span class="s">wiki</span>
+</span></span><span class="line"><span class="cl"><span class="na">/cms</span> <span class="o">=</span> <span class="s">config:cms.ini</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">;this is another comment</span>
+</span></span><span class="line"><span class="cl"><span class="k">[app:home]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#static</span>
+</span></span><span class="line"><span class="cl"><span class="na">document_root</span> <span class="o">=</span> <span class="s">%(here)s/htdocs</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[filter-app:blog]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:Authentication#auth</span>
+</span></span><span class="line"><span class="cl"><span class="na">next</span> <span class="o">=</span> <span class="s">blogapp</span>
+</span></span><span class="line"><span class="cl"><span class="na">roles</span> <span class="o">=</span> <span class="s">admin</span>
+</span></span><span class="line"><span class="cl"><span class="na">htpasswd</span> <span class="o">=</span> <span class="s">/home/me/users.htpasswd</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[app:blogapp]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:BlogApp</span>
+</span></span><span class="line"><span class="cl"><span class="na">database</span> <span class="o">=</span> <span class="s">sqlite:/home/me/blog.db</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[app:wiki]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">call:mywiki.main:application</span>
+</span></span><span class="line"><span class="cl"><span class="na">database</span> <span class="o">=</span> <span class="s">sqlite:/home/me/wiki.db</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>文件中使用单行的 <strong>[]</strong> 将配置字段划分成多个区域(section)。Paste Deploy只关注有前缀的区域，格式一般如下所示:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[composite:main]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>:前面表示该区域的类型，后面表示区域的名称，类型一般有 <em>app,filter,pipeline,composition</em> 等，下面以常见的类型做简单的介绍:</p>
+<h3 id="composite">composite</h3>
+<p>composite可以理解成是一个application的组合器或者url的分发器，负责把不同的url分发到不同的application中：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[composite:main]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#即使用Paste中的urlmap模块进行url映射分发</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#urlmap </span>
+</span></span><span class="line"><span class="cl"><span class="c1">#指向本配置文件中的home app </span>
+</span></span><span class="line"><span class="cl"><span class="na">/</span> <span class="o">=</span> <span class="s">home                </span>
+</span></span><span class="line"><span class="cl"><span class="c1">#指向本配置文件中的blog app</span>
+</span></span><span class="line"><span class="cl"><span class="na">/blog</span> <span class="o">=</span> <span class="s">blog   </span>
+</span></span><span class="line"><span class="cl"><span class="c1">#指向本配置文件中的wiki app         </span>
+</span></span><span class="line"><span class="cl"><span class="na">/wiki</span> <span class="o">=</span> <span class="s">wiki            </span>
+</span></span><span class="line"><span class="cl"><span class="c1">#指向同级目录的另一个配置文件，作为二级app挂在到/cms下</span>
+</span></span><span class="line"><span class="cl"><span class="na">/cms</span> <span class="o">=</span> <span class="s">config:cms.ini   </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="app">app</h3>
+<p>即application，app可以支持多种不同的应用，通过以下几种举例:</p>
+<p>通过.ini文件指向另一个配置文件里的应用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[app:configapp]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">config:another_config_file.ini#config_name</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>指向Egg封装的应用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[app:eggapp]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:AnotherApp</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>指向模块中的应用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[app:moduleapp]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">call:another_module:app</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>指向配置文件中的其他app</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[app:sectioneapp]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span><span class="o">=</span><span class="s">antoher_section_app</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>指向paste/factory配置的app</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[app:factoryapp]</span>
+</span></span><span class="line"><span class="cl"><span class="na">paste.app_factory</span> <span class="o">=</span> <span class="s">module_a.class_b.factory</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>指向静态资源路径</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[app:staticsfolder]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#static   </span>
+</span></span><span class="line"><span class="cl"><span class="na">document_root</span> <span class="o">=</span> <span class="s">%(here)s/htdocs 这里使用%()s用于动态载入实际目录  </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="filter">filter</h3>
+<p>即过滤器，快速构建AOP模块，通常用来做校验，日志等，我们通过以下几种类型举例:
+1.使用filter-with对指定app进行过滤</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[filter-app:blog]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:Authentication#baseauth</span>
+</span></span><span class="line"><span class="cl"><span class="na">next</span> <span class="o">=</span> <span class="s">blogapp</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>以上配置中通过use和next，指明使用baseauthfilter对blogapp进行过滤</p>
+<p>2.直接使用filter-with指定过滤器</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[app:main]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:MyEgg</span>
+</span></span><span class="line"><span class="cl"><span class="na">filter-with</span> <span class="o">=</span> <span class="s">printdebug</span>
+</span></span><span class="line"><span class="cl"><span class="k">[filter:printdebug]</span>
+</span></span><span class="line"><span class="cl"><span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#printdebug</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>跟第一种方式比起来，filter-app能够快速被多个application复用。</p>
+<p>3.使用pipeline快速建立多级过滤</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[pipeline:main]</span>
+</span></span><span class="line"><span class="cl"><span class="na">pipeline</span> <span class="o">=</span> <span class="s">filter1 egg:FilterEgg#filter2 filter3 app</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>需要注意的事，这里通过**pipeline=**指定具体的过滤，可以指定多个，配置的先后顺序就是依次通过的顺序，但是必须要以一个application作为末尾节点。</p>
+<h3 id="config-variables">Config Variables</h3>
+<p>配置文件中支持配置全局或者局部变量，这些字段会在构建app的过程中作为参数传入,实例如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[DEFAULT]</span>
+</span></span><span class="line"><span class="cl"><span class="na">key_one</span> <span class="o">=</span> <span class="s">value</span>
+</span></span><span class="line"><span class="cl"><span class="na">key_another</span> <span class="o">=</span> <span class="s">value</span>
+</span></span><span class="line"><span class="cl"><span class="k">[app:another]</span>
+</span></span><span class="line"><span class="cl"><span class="na">key_section</span> <span class="o">=</span> <span class="s">value</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在局部的配置中支持对变量进行覆盖重定义,使用关键字set</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[app:another]</span>
+</span></span><span class="line"><span class="cl"><span class="na">set key_one</span> <span class="o">=</span> <span class="s">new_value</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="factories">Factories</h3>
+<p>Factories即我们的App/Filter生成器，需要遵守协议和规范定义，根据用途的不同，可以分为以下几种:</p>
+<h4 id="1app_factory">1.app_factory</h4>
+<p>生成标准的WSGI application，规范如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">app_factory</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="o">**</span><span class="n">local_conf</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">wsgi_app</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>传入的参数:global_config和local_conf，分别对应我们的不同配置变量,以我们上面的配置文件举例，那实际传入的值如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1">#一般还会有其他字段,如__file__</span>
+</span></span><span class="line"><span class="cl"><span class="na">global_config</span> <span class="o">=</span> <span class="s">{key_one:value,key_another:value,...} </span>
+</span></span><span class="line"><span class="cl"><span class="na">local_conf</span> <span class="o">=</span> <span class="s">{key_section:value}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>举一个实际的例子，加入我们现在要定义一个application，计算传入的param1和param2的和，并返回最终的和:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">webob</span> <span class="kn">import</span> <span class="n">Request</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Calculator</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">environ</span><span class="p">)</span>        
+</span></span><span class="line"><span class="cl">        <span class="n">param1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;param1&#34;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">param2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;param2&#34;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>                 
+</span></span><span class="line"><span class="cl">        <span class="n">start_response</span><span class="p">(</span><span class="s2">&#34;200 OK&#34;</span><span class="p">,[(</span><span class="s2">&#34;Content-type&#34;</span><span class="p">,</span> <span class="s2">&#34;text/plain&#34;</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">[</span><span class="s2">&#34;RESULT=</span><span class="si">{0}</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param1</span><span class="o">+</span><span class="n">param2</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@classmethod</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">factory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">global_conf</span><span class="p">,</span> <span class="o">**</span><span class="n">local_conf</span><span class="p">):</span>        
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">Calculator</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1">#config files</span>
+</span></span><span class="line"><span class="cl"><span class="k">[app:calculator]</span>
+</span></span><span class="line"><span class="cl"><span class="na">paste.app_factory</span> <span class="o">=</span> <span class="s">tommylike:Calculator.factory</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="2filter_factory">2.filter_factory</h4>
+<p>跟我们的app_factory差不多，区别在于他接受的是一个WSGI app，同样假设我们要定义一个filter-app,用来做日志拦截记录:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">LogFilter</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Log Filter&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span><span class="n">start_response</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@classmethod</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">factory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">global_conf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">LogFilter</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1">#config files</span>
+</span></span><span class="line"><span class="cl"><span class="k">[filter:apilog]</span>
+</span></span><span class="line"><span class="cl"><span class="na">paste.filter_factory</span> <span class="o">=</span> <span class="s">tommylike:LogFilter.factory</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3filter_app_factory">3.filter_app_factory</h4>
+<p>跟filter_factory相比，传入的参数多了一个app,可以借用上面的例子比较下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#used for  filter_factory
+</span></span><span class="line"><span class="cl">@classmethod
+</span></span><span class="line"><span class="cl">  def factory(cls, global_conf, **kwargs):      
+</span></span><span class="line"><span class="cl">      return LogFilter1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#used for filter_app_factory
+</span></span><span class="line"><span class="cl">@classmethod
+</span></span><span class="line"><span class="cl">  def factory(cls,app, global_conf, **kwargs):      
+</span></span><span class="line"><span class="cl">      return LogFilter2(app)      
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="4-filter_server">4. filter_server</h4>
+<p>接受一个app，并返回封装这个app的server，举例代码如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">server_factory</span><span class="p">(</span><span class="n">global_conf</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">serve</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">s</span> <span class="o">=</span> <span class="n">Server</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">s</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">serve</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="5-server_factory">5. server_factory</h4>
+<p>与filter_server差不多，区别在于server会马上拉起来，并且app是作为第一个参数传入,根filter_factory与filter_app_factory的区别一致。</p>
+<h3 id="oslomiddleware">Oslo.middleware</h3>
+<p>在Openstack中middleware提供了内置的filter以便我们方便取用，目前主要有两种filter，healthcheck和cors middleware</p>
+<h3 id="安装">安装</h3>
+<p>oslo.middleware目前是独立的组件，可以直接安装</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo pip install oslo.middleware
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="healthcheck-middleware">healthcheck middleware</h3>
+<p>healthcheck middleware主要用于服务的健康状态检查，根据后端是否正常，返回200(服务正常)/503(服务不可用)配置文件如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[filter:healthcheck]</span>
+</span></span><span class="line"><span class="cl"><span class="na">paste.filter_factory</span> <span class="o">=</span> <span class="s">oslo_middleware:Healthcheck.factory</span>
+</span></span><span class="line"><span class="cl"><span class="na">path</span> <span class="o">=</span> <span class="s">/healthcheck</span>
+</span></span><span class="line"><span class="cl"><span class="na">backends</span> <span class="o">=</span> <span class="s">disable_by_file</span>
+</span></span><span class="line"><span class="cl"><span class="na">disable_by_file_path</span> <span class="o">=</span> <span class="s">/var/run/nova/healthcheck_disable</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[pipeline:public_api]</span>
+</span></span><span class="line"><span class="cl"><span class="na">pipeline</span> <span class="o">=</span> <span class="s">healthcheck sizelimit [...] public_service</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中 paste.filter_factory指明使用oslo_middleware中的healthcheck，path用来指明检测的具体url：<em>{resource}/healthcheck</em>,backends用来指定后端的判定方式，目前有两种：</p>
+<p>使用文件是否存在来检测，配置如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[filter:healthcheck]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#other config</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#指明使用文件来校验</span>
+</span></span><span class="line"><span class="cl"><span class="na">backends</span> <span class="o">=</span> <span class="s">disable_by_file  </span>
+</span></span><span class="line"><span class="cl"><span class="c1">#指明具体的文件，文件如果存在，healthcheck任务后端返回异常</span>
+</span></span><span class="line"><span class="cl"><span class="na">disable_by_file_path</span> <span class="o">=</span> <span class="s">/var/run/nova/healthcheck_disable </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用文件以及端口检测，配置如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[filter:healthcheck]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#other configs</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#指明文件以及端口校验</span>
+</span></span><span class="line"><span class="cl"><span class="na">backends</span> <span class="o">=</span> <span class="s">disable_by_files_ports   </span>
+</span></span><span class="line"><span class="cl"><span class="c1">#指明具体的端口和文件</span>
+</span></span><span class="line"><span class="cl"><span class="na">disable_by_file_paths</span> <span class="o">=</span> <span class="s">5000:/var/run/keystone/healthcheck_disable,  </span>
+</span></span><span class="line"><span class="cl"><span class="na">/35357:/var/run/keystone/admin_healthcheck_disable  </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>disable_by_file_paths</strong>可以指明多个端口和对应的文件，根据访问的端口进行校验，比如当前端口是5000，则根据文件*/var/run/keystone/healthcheck_disable*的存在与否决定服务是否健康，可以理解为<strong>disable_by_file</strong>的增强版本</p>
+<h3 id="cors-middleware">cors middleware</h3>
+<p>cors middlreware用来控制跨域访问控制，也可以直接在配置文件中配置:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[filter:cors]</span>
+</span></span><span class="line"><span class="cl"><span class="na">paste.filter_factory</span> <span class="o">=</span> <span class="s">oslo_middleware.cors:filter_factory</span>
+</span></span><span class="line"><span class="cl"><span class="na">allowed_origin</span><span class="o">=</span><span class="s">https://website.example.com:443,https://website2.example.com:443    #设置允许跨域访问的站点和方式等。</span>
+</span></span><span class="line"><span class="cl"><span class="na">max_age</span><span class="o">=</span><span class="s">3600</span>
+</span></span><span class="line"><span class="cl"><span class="na">allow_methods</span><span class="o">=</span><span class="s">GET,POST,PUT,DELETE</span>
+</span></span><span class="line"><span class="cl"><span class="na">allow_headers</span><span class="o">=</span><span class="s">X-Custom-Header</span>
+</span></span><span class="line"><span class="cl"><span class="na">expose_headers</span><span class="o">=</span><span class="s">X-Custom-Header</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-11-07&nbsp;<a class="git-hash" href="https://github.com/TommyLike/tommylike.cn/commit/7ab7ea9d06de09a9195066e93cc9c9d9e4cfae7b" target="_blank" title="commit by TommyLike(tommylikehu@gmail.com) 7ab7ea9d06de09a9195066e93cc9c9d9e4cfae7b: Add missing posts from tommylike github">
+                                    <i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>7ab7ea9</a></span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/paste-deploy/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://tommylike.com/paste-deploy/" data-title="Paste Deploy 入门" data-hashtags="PasteDeploy,Python,OpenStack"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://tommylike.com/paste-deploy/" data-hashtag="PasteDeploy"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://tommylike.com/paste-deploy/" data-title="Paste Deploy 入门"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://tommylike.com/paste-deploy/" data-title="Paste Deploy 入门"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://tommylike.com/paste-deploy/" data-title="Paste Deploy 入门"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/pastedeploy/">PasteDeploy</a>,&nbsp;<a href="/tags/python/">Python</a>,&nbsp;<a href="/tags/openstack/">OpenStack</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+            <a href="/amqp/" class="next" rel="next" title="Oslo Message 入门">Oslo Message 入门<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"><div id="valine" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://github.com/TommyLike" target="_blank">TommyLike</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/valine/valine.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/css/lightgallery-bundle.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/valine@1.5.0/dist/Valine.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.13.1/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{"valine":{"appId":"QGzwQXOqs5JOhN4RGPOkR2mR-MdYXbMMI","appKey":"WBmoGyJtbqUswvfLh6L8iEBr","avatar":"mp","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@14.0.0/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":false,"highlight":true,"lang":"en","pageSize":10,"placeholder":"Your comment ...","recordIP":true,"serverURLs":"https://leancloud.hugoloveit.com","visitor":true}},"lightgallery":true,"search":{"algoliaAppID":"","algoliaIndex":"","algoliaSearchKey":"","highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
