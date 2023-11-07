@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Kubernetes nginx ingress cache 实践 - TommyLike Blog</title><meta name="Description" content="Kubernetes nginx cache purge 实践."><meta property="og:title" content="Kubernetes nginx ingress cache 实践" />
+<meta property="og:description" content="Kubernetes nginx cache purge 实践." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://example.org/kubernetes-nginx/" /><meta property="og:image" content="https://example.org/kubernetes-nginx/featured-image.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-11-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-11-06T23:20:37+08:00" /><meta property="og:site_name" content="TommyLike" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://example.org/kubernetes-nginx/featured-image.png"/>
+<meta name="twitter:title" content="Kubernetes nginx ingress cache 实践"/>
+<meta name="twitter:description" content="Kubernetes nginx cache purge 实践."/>
+<meta name="application-name" content="TommyLike">
+<meta name="apple-mobile-web-app-title" content="TommyLike"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://example.org/kubernetes-nginx/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Kubernetes nginx ingress cache 实践",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/example.org\/kubernetes-nginx\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/example.org\/kubernetes-nginx\/featured-image.png",
+                            "width":  768 ,
+                            "height":  427 
+                        }],"genre": "posts","keywords": "ArgoCD, Nginx, Kubernetes","wordcount":  685 ,
+        "url": "https:\/\/example.org\/kubernetes-nginx\/","datePublished": "2020-11-28T00:00:00+00:00","dateModified": "2023-11-06T23:20:37+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "TommyLike","logo": "https:\/\/s.gravatar.com\/avatar\/b342014f4772fb9bc0f0577ef9c2f937?s=80"},"author": {
+                "@type": "Person",
+                "name": "TommyLike"
+            },"description": "Kubernetes nginx cache purge 实践."
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="TommyLike Blog"><span class="header-title-pre"><i class='far fa-kiss-wink-heart fa-fw' aria-hidden='true'></i></span>Lifelong Learning</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="https://github.com/TommyLike/tommylike.cn" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw' aria-hidden='true'></i>  </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="TommyLike Blog"><span class="header-title-pre"><i class='far fa-kiss-wink-heart fa-fw' aria-hidden='true'></i></span>Lifelong Learning</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="https://github.com/TommyLike/tommylike.cn" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw' aria-hidden='true'></i></a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Kubernetes nginx ingress cache 实践</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://github.com/TommyLike" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>TommyLike</a></span>&nbsp;<span class="post-category">included in <a href="/categories/kubernetes/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Kubernetes</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2020-11-28">2020-11-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;685 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;<span id="/kubernetes-nginx/" class="leancloud_visitors" data-flag-title="Kubernetes nginx ingress cache 实践">
+                        <i class="far fa-eye fa-fw" aria-hidden="true"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;views
+                    </span>&nbsp;</div>
+        </div><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/kubernetes-nginx/featured-image.png"
+        data-srcset="/kubernetes-nginx/featured-image.png, /kubernetes-nginx/featured-image.png 1.5x, /kubernetes-nginx/featured-image.png 2x"
+        data-sizes="auto"
+        alt="/kubernetes-nginx/featured-image.png"
+        title="Kubernetes nginx cache purge 实践." /></div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#背景和前提">背景和前提</a></li>
+    <li><a href="#准备">准备</a></li>
+    <li><a href="#环境准备">环境准备</a></li>
+    <li><a href="#主要配置">主要配置</a></li>
+    <li><a href="#启用cache">启用cache</a></li>
+    <li><a href="#开启purge">开启Purge</a></li>
+    <li><a href="#触发purge">触发Purge</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>最近项目在对部署在香港节点的网站服务做资源加载提速，本文主要记录了在kubernetes的原生nginx ingress中引入server cache的流程和方案，
+里面涉及的都是最为常见的技术，并没有什么新的东西，算是一个总结和记录。</p>
+<h2 id="背景和前提">背景和前提</h2>
+<p>当前已上线的网站都是基于<code>Nginx Ingress</code> + <code>Hugo/Vue Server</code>的模式部署的，发布采用 <code>ArgoCD(GitOps)</code> + <code>Jenkins</code> ,大致的流程如下:
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/images/website-pipeline.png"
+        data-srcset="/images/website-pipeline.png, /images/website-pipeline.png 1.5x, /images/website-pipeline.png 2x"
+        data-sizes="auto"
+        alt="/images/website-pipeline.png"
+        title="Website pipeline" width="1034" height="458" /></p>
+<h2 id="准备">准备</h2>
+<p>Nginx做Server端的缓存目前有2种方式比较常见:</p>
+<ol>
+<li>基于外置的中间件做数据缓存，比如Nginx官方Redis Module给出的<a href="https://www.nginx.com/resources/wiki/modules/redis/" target="_blank" rel="noopener noreffer ">部署介绍</a>，
+这种方式的好处就是: 缓存集中，有利于命中和清理，同时不会增加nginx本身的业务复杂度，但他也有问题，就是会引入部署的成本。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">server <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    location / <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">set</span> <span class="nv">$redis_key</span> <span class="nv">$uri</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        redis_pass     name:6379<span class="p">;</span>
+</span></span><span class="line"><span class="cl">        default_type   text/html<span class="p">;</span>
+</span></span><span class="line"><span class="cl">        error_page     <span class="nv">404</span> <span class="o">=</span> /fallback<span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nv">location</span> <span class="o">=</span> /fallback <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        proxy_pass backend<span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>基于Nginx本身的<code>proxy_cache</code>实现，这个是官方很早就引入的功能，直接利用本地磁盘做缓存存储，考虑到网站本身的规模和系统复杂度,
+我们选择了nginx自带的<code>proxy_cache</code>加kubernetes中的<code>memory emptyDir</code>做服务端缓存。</li>
+</ol>
+<h2 id="环境准备">环境准备</h2>
+<p>Nginx本身已经包含了proxy_cache的模块，不过关于purge的功能却仅在商业版本中才包含，所以我们需要自己引入并制作镜像，下面是社区推荐的第三方
+的purge模块:</p>
+<pre><code>https://github.com/FRiCKLE/ngx_cache_purge
+</code></pre>
+<p>很遗憾他并不支持批量的缓存清除，从README里面的配置指导可以看出，我们需要对缓存的资源进行逐个清除:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">http <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    proxy_cache_path  /tmp/cache  <span class="nv">keys_zone</span><span class="o">=</span>tmpcache:10m<span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    server <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        location / <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            proxy_pass         http://127.0.0.1:8000<span class="p">;</span>
+</span></span><span class="line"><span class="cl">            proxy_cache        tmpcache<span class="p">;</span>
+</span></span><span class="line"><span class="cl">            proxy_cache_key    <span class="nv">$uri$is_args$args</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        location ~ /purge<span class="o">(</span>/.*<span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            allow              127.0.0.1<span class="p">;</span>
+</span></span><span class="line"><span class="cl">            deny               all<span class="p">;</span>
+</span></span><span class="line"><span class="cl">            proxy_cache_purge  tmpcache <span class="nv">$1$is_args$args</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>而且，这个仓库已经6年没人维护了，好在最近nginx社区自己fork并维护起来了<a href="https://github.com/nginx-modules/ngx_cache_purge" target="_blank" rel="noopener noreffer ">地址</a>，
+最关键的是作者还加入了我们正想要的<code>Partial Keys</code>功能 :) 。</p>
+<p>Nginx ingress关于怎么制作自定义镜像的指导比较少，不过从Makefile里面能快速搜索到他们的<a href="https://github.com/kubernetes/ingress-nginx/tree/master/images/nginx" target="_blank" rel="noopener noreffer ">Base Image</a>
+而且制作镜像的流程非常清晰，基于现有的流程做扩展和第三方Module引入还是比较方便的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">现有引入的Module:
+</span></span><span class="line"><span class="cl">nginx-http-auth-digest
+</span></span><span class="line"><span class="cl">ngx_http_substitutions_filter_module
+</span></span><span class="line"><span class="cl">nginx-opentracing
+</span></span><span class="line"><span class="cl">opentracing-cpp
+</span></span><span class="line"><span class="cl">zipkin-cpp-opentracing
+</span></span><span class="line"><span class="cl">dd-opentracing-cpp
+</span></span><span class="line"><span class="cl">ModSecurity-nginx (only supported in x86_64)
+</span></span><span class="line"><span class="cl">brotli
+</span></span><span class="line"><span class="cl">geoip2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>完整的改动已经放到了我们组织的fork<a href="https://github.com/opensourceways/ingress-nginx/tree/feature/enable_cache_purge" target="_blank" rel="noopener noreffer ">仓库</a>,
+需要注意的一个点就是nginx ingress官方为了支持多架构和性能，在构建镜像时引入了<strong>buildx</strong>组件， 他跟我们原生的docker build有一点区别是他并不会默认导出制作好的镜像，需要我们在命令中具体指明，如:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#具体文档，请移步: https://github.com/docker/buildx
+</span></span><span class="line"><span class="cl">docker buildx build --output=type=docker .
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>有了基础镜像，在制作controller的镜像时，只需要将<strong>BASE_IMAGE</strong>替换为我们生成好的镜像即可, 如:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">BASE_IMAGE=opensourceways/ingress-nginx-with-purge:0.0.1 make image
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>有了镜像，可以在镜像中通过<code>nginx -V</code>确认模块以加载:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">➜  ~ docker run -it --rm  opensourceway/ingress-nginx-controller-with-purge-cache:v0.35.0.0 nginx -V
+</span></span><span class="line"><span class="cl">nginx version: nginx/1.19.2
+</span></span><span class="line"><span class="cl">built by gcc 9.3.0 (Alpine 9.3.0)
+</span></span><span class="line"><span class="cl">built with OpenSSL 1.1.1g  21 Apr 2020
+</span></span><span class="line"><span class="cl">TLS SNI support enabled
+</span></span><span class="line"><span class="cl">&lt;content skipped&gt;
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/ngx_devel_kit-0.3.1 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/set-misc-nginx-module-0.32 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/headers-more-nginx-module-0.33 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/nginx-http-auth-digest-cd8641886c873cf543255aeda20d23e4cd603d05 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/ngx_http_substitutions_filter_module-bc58cb11844bc42735bbaef7085ea86ace46d05b 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/lua-nginx-module-0.10.17 --add-module=/tmp/build/stream-lua-nginx-module-0.0.8 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/lua-upstream-nginx-module-0.07 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/nginx-influxdb-module-5b09391cb7b9a889687c0aa67964c06a2d933e8b 
+</span></span><span class="line"><span class="cl">--add-dynamic-module=/tmp/build/nginx-opentracing-0.9.0/opentracing 
+</span></span><span class="line"><span class="cl">--add-dynamic-module=/tmp/build/ModSecurity-nginx-b55a5778c539529ae1aa10ca49413771d52bb62e 
+</span></span><span class="line"><span class="cl">--add-dynamic-module=/tmp/build/ngx_http_geoip2_module-3.3 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/nginx_ajp_module-bf6cd93f2098b59260de8d494f0f4b1f11a84627 
+</span></span><span class="line"><span class="cl">--add-module=/tmp/build/ngx_brotli --add-module=/tmp/build/ngx_cache_purge-2.5.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>有了镜像，下一步就是配置了。</p>
+<h2 id="主要配置">主要配置</h2>
+<ol>
+<li><code>proxy_cache_path</code>:</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">Syntax:	proxy_cache_path path <span class="o">[</span><span class="nv">levels</span><span class="o">=</span>levels<span class="o">]</span> <span class="o">[</span><span class="nv">use_temp_path</span><span class="o">=</span>on<span class="p">|</span>off<span class="o">]</span> <span class="nv">keys_zone</span><span class="o">=</span>name:size <span class="o">[</span><span class="nv">inactive</span><span class="o">=</span>time<span class="o">]</span> <span class="o">[</span><span class="nv">max_size</span><span class="o">=</span>size<span class="o">]</span> <span class="o">[</span><span class="nv">min_free</span><span class="o">=</span>size<span class="o">]</span> <span class="o">[</span><span class="nv">manager_files</span><span class="o">=</span>number<span class="o">]</span> <span class="o">[</span><span class="nv">manager_sleep</span><span class="o">=</span>time<span class="o">]</span> <span class="o">[</span><span class="nv">manager_threshold</span><span class="o">=</span>time<span class="o">]</span> <span class="o">[</span><span class="nv">loader_files</span><span class="o">=</span>number<span class="o">]</span> <span class="o">[</span><span class="nv">loader_sleep</span><span class="o">=</span>time<span class="o">]</span> <span class="o">[</span><span class="nv">loader_threshold</span><span class="o">=</span>time<span class="o">]</span> <span class="o">[</span><span class="nv">purger</span><span class="o">=</span>on<span class="p">|</span>off<span class="o">]</span> <span class="o">[</span><span class="nv">purger_files</span><span class="o">=</span>number<span class="o">]</span> <span class="o">[</span><span class="nv">purger_sleep</span><span class="o">=</span>time<span class="o">]</span> <span class="o">[</span><span class="nv">purger_threshold</span><span class="o">=</span>time<span class="o">]</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">Default:	—
+</span></span><span class="line"><span class="cl">Context:	http
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个是cache的全局配置，其中几个比较重要的字段介绍如下:</p>
+<ul>
+<li><code>path</code>: 缓存的配置路径</li>
+<li><code>keys_zone:&lt;name:size&gt;</code>: 缓存的key区域，当开启某个domain的访问缓存时，使用<code>proxy_cache</code>指定对应的key_zone, 注意缓存的key是存储在内存中的，所以需要指定存储的上限，根据官方文档，1mb基本可以存储8k个key。</li>
+<li><code>use_temp_path</code>：是否启用temp目录用于上游返回内容的保存，nginx的cache在开启temp_path的时候会有2步，保存结果到temp目录，拷贝到cache目录，建议关闭。</li>
+<li><code>inactive</code>: 缓存的保留时间<code>retention</code>, 如果超过时间资源没有被访问，缓存将被清除。</li>
+<li><code>max_size</code>: 缓存数据的最大占用空间，超出后空间将被清理(基于最近最少使用原则)，</li>
+<li><code>levels</code> + <code>proxy_cache_key</code>: 这2个字段配合起来，决定了我们缓存存储的路径，其中level决定了存储的目录层级以及目录名，cache_key决定了最终的文件名，举个例子，比如我的配置如下：</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">proxy_cache_key <span class="nv">$uri$is_args$args</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">proxy_cache_path /tmp/statics_cache <span class="nv">levels</span><span class="o">=</span>1:2 <span class="nv">keys_zone</span><span class="o">=</span>statics_cache:50m <span class="nv">use_temp_path</span><span class="o">=</span>off <span class="nv">max_size</span><span class="o">=</span>500m <span class="nv">inactive</span><span class="o">=</span>1h<span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当我们访问<code>http://somedomain.com/public/img/grafana_icon.svg</code>的时候，对<code>proxy_cache_key</code>(/img/grafana_icon.svg)进行MD5计算，得:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">➜  ~ md5 -s &#34;/public/img/grafana_icon.svg&#34;
+</span></span><span class="line"><span class="cl">MD5 (&#34;/public/img/grafana_icon.svg&#34;) = e07fe02651e785ebf74c2c5c0abae094
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>那我们最终的存储路径就是:/tmp/statics_cache/4/09/e07fe02651e785ebf74c2c5c0abae094, 其中目录信息反向截图。</p>
+<ol start="2">
+<li><code>proxy_cache_lock</code>: cache锁，在多个请求访问同样资源，且开启cache的情况下，只有一个请求有权限去生成cache或访问cache。</li>
+<li><code>proxy_cache_valid</code>: cache的有效时间，超期的缓存将从上游重新获取， 我们可以基于返回结果做差异化配置，比如<code>proxy_cache_valid 404      1m;</code>设置404近保留1分钟。</li>
+<li><code>proxy_ignore_headers</code>：忽略响应中的某些header，比如: <code>proxy_ignore_headers Cache-Control</code>就能忽略上游的缓存策略，避免对我们的server cache造成影响。</li>
+<li><code>proxy_cache_methods</code>: 缓存的http方法，默认会包含GET和HEAD。</li>
+<li><code>proxy_cache_min_uses</code>: 设置资源访问多少次后再缓存，提高阈值能确保高频率的资源被缓存和使用。
+基于上面的配置，我们就能在nginx-ingress中configmap中引入http-snippet， 修改deployment确保emptyDir挂载:</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">http-snippet</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">    proxy_cache_path /tmp/statics_cache levels=1:2 keys_zone=statics_cache:50m use_temp_path=off max_size=500m inactive=1h;</span><span class="w">    
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx-configuration</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">ingress-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># other attribute in deployment are ignored.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx-proxy-cache</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">emptyDir</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">medium</span><span class="p">:</span><span class="w"> </span><span class="l">Memory</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">sizeLimit</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;500Mi&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="启用cache">启用cache</h2>
+<p>当需要网站的server cache时，需要在具体的Ingress中做如下配置:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">nginx.ingress.kubernetes.io/proxy-buffering: <span class="s2">&#34;on&#34;</span>
+</span></span><span class="line"><span class="cl">nginx.ingress.kubernetes.io/server-snippet: <span class="p">|</span>
+</span></span><span class="line"><span class="cl">  proxy_cache statics_cache<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  proxy_cache_lock on<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  proxy_cache_key <span class="nv">$server_name$uri$is_args$args</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  proxy_ignore_headers Cache-Control<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  proxy_ignore_headers Set-Cookie<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  proxy_cache_valid 60m<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  add_header X-Cache-Status <span class="nv">$upstream_cache_status</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  location ~ /purge<span class="o">(</span>/.*<span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">      allow 127.0.0.1<span class="p">;</span>
+</span></span><span class="line"><span class="cl">      allow 172.20.0.0/16<span class="p">;</span>      
+</span></span><span class="line"><span class="cl">      deny all<span class="p">;</span>
+</span></span><span class="line"><span class="cl">      proxy_cache_purge  statics_cache <span class="nv">$server_name$1$is_args$args</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>说明如下：</p>
+<ol>
+<li><code>proxy_buffering</code>： 这个是开启缓存的前提，nginx ingress默认是关闭的。</li>
+<li><code>add_header</code>: 在返回的Header中添加cache status <strong>(MISS,HIT,EXPIRED)</strong>，用于查看缓存命中情况，如果我们在location server等多处有定义add_header, 需要注意的一点是:</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl"># from nginx document
+</span></span><span class="line"><span class="cl">There could be several add_header directives. These directives are inherited from the previous configuration level if and only if there are no add_header directives defined on the current level.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li><code>proxy_cache_key</code>: 在nginx ingress中我们一般会服务多个domain，所以这里的key需要引入server_name避免相互干扰。</li>
+</ol>
+<h2 id="开启purge">开启Purge</h2>
+<p>首先并不是所有的情况下都需要purge，毕竟现在有很多解决方案可以确保版本更新后缓存自动失效. 比如在生成资源时对文件名做hash:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">zh-cn_image_0183048952.d04e2e5f.png
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者是在请求中带上发布版本的版本号参数:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/abc.css?v=20201012
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这些都会导致缓存的key失效，从而避免干扰，不过我们并不能保证所有的情况下都能满足，所以需要支持通过API调用清理失效的缓存，purge模块支持我们配置单独的API用于网站缓存资源清理(前缀匹配):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">location ~ /purge<span class="o">(</span>/.*<span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  allow 127.0.0.1
+</span></span><span class="line"><span class="cl">  allow 172.20.0.0/16<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  deny all<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  proxy_cache_purge  statics_cache <span class="nv">$server_name$1$is_args$args</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>上面的配置段需要同样添加到server-snippet中，且仅支持内网访问，<strong>注意</strong>：<code>proxy_cache_purge</code>的key需要跟<code>proxy_cache_key</code>保持一致。
+我们通过API测试，结果是<code>some-domain</code>的缓存资源都会被清除:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$: curl  -H <span class="s2">&#34;Host:some-domain&#34;</span> -k  https://&lt;nginx-endpoint&gt;/purge/*
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Successful purge<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">body</span> <span class="na">bgcolor</span><span class="o">=</span><span class="s">&#34;white&#34;</span><span class="p">&gt;&lt;</span><span class="nt">center</span><span class="p">&gt;&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Successful purge<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Key : some-domain/*<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;&lt;/</span><span class="nt">center</span><span class="p">&gt;&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>不过，我们还有一个问题: nginx ingress都是多实例的，清理单个实例还不够，当前原生的Kubernetes中并没有类似的概念可以支持我们一次性清理，只能考虑将purge的请求复制多份到endpoints分别处理, 大致的逻辑如下<a href="https://stackoverflow.com/questions/49612412/kubenetes-is-it-possible-to-hit-multiple-pods-with-a-single-request-in-kubernet" target="_blank" rel="noopener noreffer ">Stackoverflow</a>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>cat /var/run/secrets/kubernetes.io/serviceaccount/token<span class="k">)</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">curl https://kubernetes.default.svc/api/v1/namespaces/default/endpoints --silent <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--header <span class="s2">&#34;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&#34;</span> --insecure <span class="p">|</span> jq -rM <span class="s2">&#34;.items[].subsets[].addresses[].ip&#34;</span> <span class="p">|</span> xargs curl
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们搭建了一个Basic Auth的<a href="https://github.com/opensourceways/smart_tools/tree/main/nginx-purger" target="_blank" rel="noopener noreffer ">Http Server</a>用于响应流水线中的清除缓存动作。
+有了他我们就差最后一步，跟发布的流水线对接, 前文有提到我们的发布流程是基于<code>Jenkins + ArgoCD</code>实现的，
+考虑到ArgoCD本身就有<a href="https://argoproj-labs.github.io/argocd-notifications/services/webhook/" target="_blank" rel="noopener noreffer ">Webhook机制</a>，所以我们的应用的部署代码仓库需要新增如下资源:</p>
+<h2 id="触发purge">触发Purge</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">batch/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Job</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">website-nginx-purge</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">argocd.argoproj.io/hook</span><span class="p">:</span><span class="w"> </span><span class="l">PostSync</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">argocd.argoproj.io/hook-delete-policy</span><span class="p">:</span><span class="w"> </span><span class="l">BeforeHookCreation</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ttlSecondsAfterFinished</span><span class="p">:</span><span class="w"> </span><span class="m">600</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">purge-trigger</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">curlimages/curl:7.72.0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">env</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">USERNAME</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">secretKeyRef</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">username</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">purge-secrets</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">PASSWORD</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">valueFrom</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">secretKeyRef</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">password</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">purge-secrets</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">command</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="l">curl</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- -<span class="l">u</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="l">$(USERNAME):$(PASSWORD)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- --<span class="l">fail</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="l">https://&lt;api-endpoints&gt;/nginx-purger/purge?hostname=&lt;hostname-to-purge&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Never</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">backoffLimit</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样一旦我们更新网站，ArgoCD的Sync行为结束，nginx ingress中的cache就会被自动清除:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">nginx cache purged for host: some-domain on ingress instance 172.20.0.103 
+</span></span><span class="line"><span class="cl">nginx cache purged for host: some-domain on ingress instance 172.20.0.144
+</span></span><span class="line"><span class="cl">nginx cache purged for host: some-domain on ingress instance 172.20.0.56
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>需要注意的是:</p>
+<ol>
+<li><code>argocd.argoproj.io/hook-delete-policy: BeforeHookCreation</code>: 能确保每次synced后Job资源删除后执行。</li>
+<li>argo的application不能设置为自动Sync，这样会导致缓存被频繁清除。</li>
+</ol>
+<p>全文完。</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-11-06&nbsp;<a class="git-hash" href="https://github.com/TommyLike/tommylike.cn/commit/7a65c974d7998ae9c94271bbe30e6ac849359450" target="_blank" title="commit by TommyLike(tommylikehu@gmail.com) 7a65c974d7998ae9c94271bbe30e6ac849359450: Add first blog">
+                                    <i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>7a65c97</a></span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/kubernetes-nginx/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://example.org/kubernetes-nginx/" data-title="Kubernetes nginx ingress cache 实践" data-hashtags="ArgoCD,Nginx,Kubernetes"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://example.org/kubernetes-nginx/" data-hashtag="ArgoCD"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://example.org/kubernetes-nginx/" data-title="Kubernetes nginx ingress cache 实践"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://example.org/kubernetes-nginx/" data-title="Kubernetes nginx ingress cache 实践"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://example.org/kubernetes-nginx/" data-title="Kubernetes nginx ingress cache 实践"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/argocd/">ArgoCD</a>,&nbsp;<a href="/tags/nginx/">Nginx</a>,&nbsp;<a href="/tags/kubernetes/">Kubernetes</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"></div>
+</div>
+<div id="comments"><div id="valine" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://github.com/TommyLike" target="_blank">TommyLike</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/valine/valine.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/css/lightgallery-bundle.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/valine@1.5.0/dist/Valine.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.13.1/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{"valine":{"appId":"QGzwQXOqs5JOhN4RGPOkR2mR-MdYXbMMI","appKey":"WBmoGyJtbqUswvfLh6L8iEBr","avatar":"mp","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@14.0.0/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":false,"highlight":true,"lang":"en","pageSize":10,"placeholder":"Your comment ...","recordIP":true,"serverURLs":"https://leancloud.hugoloveit.com","visitor":true}},"lightgallery":true,"search":{"algoliaAppID":"","algoliaIndex":"","algoliaSearchKey":"","highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

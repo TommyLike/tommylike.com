@@ -1,0 +1,18 @@
+<urlset
+    xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    ><url>
+            <loc>https://example.org/kubernetes-nginx/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/tags/argocd/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/categories/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/tags/kubernetes/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/categories/kubernetes/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/tags/nginx/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/posts/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/tags/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/</loc><lastmod>2023-11-06T23:20:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/about/</loc><lastmod>2023-11-06T19:59:57&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/categories/documentation/</loc><lastmod>2023-11-06T19:59:57&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/tags/content/_index.zh-cn/</loc><lastmod>2023-11-06T19:59:57&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/tags/installation/_index.zh-cn/</loc><lastmod>2023-11-06T19:59:57&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://example.org/tags/configuration/_index.zh-cn/</loc><lastmod>2023-11-06T19:59:57&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url></urlset>

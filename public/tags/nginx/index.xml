@@ -1,0 +1,17 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Nginx - Tag - TommyLike Blog</title>
+        <link>https://example.org/tags/nginx/</link>
+        <description>Nginx - Tag - TommyLike Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>tommylikehu@gmail.com (TommyLike)</managingEditor>
+            <webMaster>tommylikehu@gmail.com (TommyLike)</webMaster><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sat, 28 Nov 2020 00:00:00 &#43;0000</lastBuildDate><atom:link href="https://example.org/tags/nginx/" rel="self" type="application/rss+xml" /><item>
+    <title>Kubernetes nginx ingress cache 实践</title>
+    <link>https://example.org/kubernetes-nginx/</link>
+    <pubDate>Sat, 28 Nov 2020 00:00:00 &#43;0000</pubDate>
+    <author>TommyLike</author>
+    <guid>https://example.org/kubernetes-nginx/</guid>
+    <description><![CDATA[<p>最近项目在对部署在香港节点的网站服务做资源加载提速，本文主要记录了在kubernetes的原生nginx ingress中引入server cache的流程和方案，
+里面涉及的都是最为常见的技术，并没有什么新的东西，算是一个总结和记录。</p>]]></description>
+</item>
+</channel>
+</rss>
