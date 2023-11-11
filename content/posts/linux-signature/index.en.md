@@ -7,7 +7,7 @@ authorLink: "https://github.com/TommyLike"
 description:  "Building a sign system in Rust language."
 resources:
     - name: "featured-image"
-      src: "featured-image.png"
+      src: "featured-image.webp"
 tags: ["Linux", "Rust", "openPGP", "X509", "TEE"]
 categories: ["Linux"]
 lightgallery: true
@@ -21,17 +21,16 @@ lightgallery: true
 签名服务的场景支持有限。社区的签名需求涵盖了openPGP和X509两个密钥体系，然而，OBS Sign主要针对openPGP体系，对X509的支持有所欠缺，并且还未实现相关文件格式的支持。为了满足不同密钥体系的需求以及更多的文件格式，我们需要进一步完善和扩展。 其
 次，目前签名服务的管理和维护相对不便。缺乏集中且易用的管理界面使得密钥的更新和迁移流程变得繁琐。此外，当前设计中采用的本地密钥存储方式和http的传输方式也间接增加了安全风险。为了提升管理的便利性和安全性，我们需要引入一个集中化的管
 理界面，并考虑更安全的密钥存储方案。最后，签名性能也存在一些不足之处。当前签名服务无法多实例运行，并且后端签名程序的并发性能有限。这导致在进行版本集中签名时出现长时间的卡顿甚至失败情况。为了改善签名的效率和稳定性，我们需要优化签名服务的架构，
-使其支持多实例运行，并提升后端签名程序的并发处理能力。![obs-sign](/images/linux-signature/obs-sign.png)
+使其支持多实例运行，并提升后端签名程序的并发处理能力。
+![obs-sign](/images/linux-signature/obs-sign.webp)
 基于以上问题，我们决定在社区引入一个新的签名系统，其中最简单的方法是对接公司现有的签名平台，能力和安全性都具备，不过最大的问题是运行界面在公司外网，且短期内外溢能力也不太现实，另外，我们也尝试直接采购硬件加密机或云服务作为基础的签名解决方案，但最终放弃了这些选择，主要是基于以下两个原因：
-
 1. 部署和运维成本：社区基础设施主要依赖云服务，采购硬件加密机会增加设备托管和维护的工作量。在没有实验室的情况下，设备托管变得复杂，而且也间接增加了集群部署的地域限制。
 2. 对openPGP体系支持不足：openPGP作为一个独立的体系，无论是在线还是离线服务，都不直接支持，需要我们在实际使用过程中进行解耦和转换。这种不足降低了解决方案的通用性。
-
 由此，我们提议在社区里面构建一个相对独立且通用的面相操作系统领域的签名服务，同时做到系统性能更好，安全性更高，管理界面更友好
 ## 业界趋势
 
 说起签名系统，不得不提到Linux Foundation下的SigStore项目，该项目主要围绕容器镜像文件提供了全流程的签名验签能力，相比很多其他方案，他实现方案更完备，更便捷，我们这里简单介绍下基于SigStore的签名流程:
-![sigstore](/images/linux-signature/sigstore.png)
+![sigstore](/images/linux-signature/sigstore.webp)
 
 1. 开发人员使用Cosign通过 OIDC（Google、Github、Microsoft 等账号）进行身份认证
 2. 认证通过后，Fulcio服务给开发者颁发关联邮箱身份的短期证书，也同步给Rekor
@@ -52,7 +51,7 @@ Sigstore安全的核心在与临时的秘钥对与公开防篡改的记录，我
 2. kernel-module-signer：这是一个针对Kernel Module文件签名的命令行工具，其功能与Kernel中的sign-file工具相同。同样地，它也在Rust的crate上发布，为开发者提供了一个便捷的KO签名工具。
 3. rpm-rs：这是一个针对rpm包体系的文件解析和组装库，通过我们的推动，目前已经实现了对RSA/EDDSA算法的支持，这为使用Rust的开发者提供了在处理rpm包时的更多灵活性和功能性。
 
-![rust](/images/linux-signature/rust.png)
+![rust](/images/linux-signature/rust.webp)
 
 ### CSP模型+异步框架
 
@@ -67,20 +66,20 @@ pub trait FileHandler: Send + Sync {
 ```
 
 整个签名过程客户端的运行流程示意如下:
-![async](/images/linux-signature/async.png)
+![async](/images/linux-signature/async.webp)
 结合全流程的异步框架和GRPC Stream，整个系统在降低内存占用的同时，能非常明显的提升签名性能，我们以签名openEuler21.09版本中的所有源码包举例(大概有4100个软件包，空间占用10GB左右)，在同样的规格，同样并发的情况下，整体会有5到20倍的性能提升，客户端越多效果提升越明显。
-![performance](/images/linux-signature/performance.png)
+![performance](/images/linux-signature/performance.webp)
 另外考虑到大文件内容在网络传输占用带宽的问题，下一步我们计划将整个签名信息计算的过程做深入梳理，核心是拆解openPGP和X509签名的内部逻辑，做到在本地完成部分签名数据准备后，只用传输文件的摘要到服务端做最后一步签名计算，预计将进一步减少网络带宽及服务端计算压力。
 
 ### HSM+TEE
 为了保证私钥的绝对安全，整个系统在设计的过程中对接了云服务中基于硬件加密模块(HSM)的秘钥管理服务，整个系统被设计为三层秘钥结构，其中Master Key存储在云服务的硬件加密模块中，负责整个集群中敏感数据的加解密，而Cluster Key和 DateKey则保存在本地，每次集群启动的时候，会经由Master Key完成一次性的解密工作。
-![keys](/images/linux-signature/key-hierarchy.png)
+![keys](/images/linux-signature/key-hierarchy.webp)
 为了保证整个运行过程的安全，整个秘钥操作的过程也被设计成独立的签名模块，支持整体迁移至TEE环境中，数据出入TEE环境均是加密数据，同时Master Key的加解密调用将严格限制在TEE环境中，从而提升安全等级，整个服务最终的组件架构如下:
-![sign system](/images/linux-signature/sign_system.png)
+![sign system](/images/linux-signature/sign_system.webp)
 ## 技术实现
 ### 文件及签名格式解析
 针对RPM， EFI等不同文件的识别和签名封装，需要梳理现有文件规范，并参考现有代码逻辑，最终拆解到系统流程中去，我们以RPM举例，整个RPM文件包含Identifier，Signature，Header，Payload四个区域，完整的签名信息包含多个Tag，分别用于存储文件摘要，签名值，内容长度等，每个Tag的定义及解释如下
-![rpm](/images/linux-signature/rpm.png)
+![rpm](/images/linux-signature/rpm.webp)
 1. **RPMSIGTAG_SIZE**: Header和Payload两个区域加一起的大小。
 2. **RPMSIGTAG_PAYLOADSIZE**: Payload压缩前的大小。
 3. **RPMSIGTAG_SHA1**: Header Section的SHA1摘要。
@@ -91,14 +90,14 @@ pub trait FileHandler: Send + Sync {
 8. **RPMSIGTAG_GPG:** Header section和Payload section的DSA签名信息，跟DSA Header需要同时使用。
 
 我们以RSA的openPGP秘钥签名为例，要最终存储Signature的信息如下:
-![rpm](/images/linux-signature/rpm2.png)
+![rpm](/images/linux-signature/rpm2.webp)
 对比KernelModule文件来看，KO签名信息的识别和组装会更加简单，整个文件的签名信息会通过追加的方式补充到原始文件中，包括1. 二进制X509签名CMS信息，2. 签名的元数据`module_signature`以及3. 签名的魔法数字`~Module signature appended~`三个部分。
-![kernel-module](/images/linux-signature/kernel-module.png)
+![kernel-module](/images/linux-signature/kernel-module.webp)
 EFI体系会相对复杂，首先，EFI可执行文件是一个 PE/COFF 格式文件，其次整个过程会遵循 Microsoft Authenticode 规范来操作，整个签名的过程如下：
 1. 使用`Microsoft Authenticode`中的方法计算EFI文件的摘要（当前只支持sha256）
 2. 使用X509秘钥对对上面的摘要进行签名，并将其嵌入一个 `PKCS #7 SignedData` 结构中
 3. 以上签名将嵌入到一个`WIN_CERTIFICATE`结构体并最终嵌入到EFI文件中，另外，签名的偏移位置和大小在EFI文件的`optional header` 补充
-![efi](/images/linux-signature/efi.png)
+![efi](/images/linux-signature/efi.webp)
 
 ### 多秘钥体系支持
 签名系统需要至少支持X509及openPGP两种体系，为保证扩展性，数据存储，加解密后端及具体的秘钥插件均被抽象成独立的组件，可根据需求在后续的迭代中升级替换，以具体秘钥插件举例，实例插件只需要实现SignPlugin中，秘钥生成和导入，签名执行，秘钥文件解析等操作即可:
@@ -124,7 +123,7 @@ pub trait SignPlugins: Send + Sync {
 
 ### 集群与客户端负载均衡
 签名系统实际运行的生产环境通常都需要部署多个客户端对接不同的构建机器，为提升系统支撑的集群规模，后端服务实例在设计时也支持水平扩展，这本是一种最为常见的设计，不过在叠加HTTP2.0(gRPC基于HTTP2.0)的多路复用及Kubernetes原生Service场景后，负载均衡会失效，造成局部节点过热的问题，为避免类似问题，我们在结合了基于DNS的客户端RoundRobin路由及Nginx的反向代理的两种负载均衡模式，能实现高效简单的gRPC负载均衡，同时支持集群内外2种访问模式。
-![loadbalancer](/images/linux-signature/loadbalancer.png)
+![loadbalancer](/images/linux-signature/loadbalancer.webp)
 
 ### 客户端身份校验
 客户端的身份校验，复用了现有X509秘钥体系中私有Certificate Authority的设计，我们在客户端的配置和调用中引入了基于CRL Distribution Points DP的有效性校验，服务端可以根据实际情况为不同客户端分分发独立的客户端证书，也可随时吊销客户端证书。
